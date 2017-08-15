@@ -44,11 +44,45 @@ bool validUtf8(vector<int>& data) {
 	return true;
 }
 
+bool validUtf8_2(vector<int>& data) {
+	for (int i = 0; i < data.size(); i++) {
+		unsigned int first = data[i];
+		int nrOnes = 0, pos = 7;
+		if (first & (1 << pos)) {
+			nrOnes++;
+			pos--;
+			while ((first & (1<< pos)) && pos >= 0) {
+				nrOnes++;
+				pos--;
+			}
+		}
+		if (nrOnes == 0) {
+			continue;
+		}
+		
+		if (nrOnes > 1 && nrOnes <= 4) {
+			if (i + nrOnes - 1 <= data.size() - 1) {
+				for (int j = i + 1; j <= i + nrOnes - 1; j++) {
+					if ((data[j] & (1<<7)) == 0 || (data[j] & (1 << 6)) > 0) {
+						return false;
+					} 
+				}
+				i += nrOnes - 1;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		} 
+	}
+	return true;
+}
+
 int main() {
 	vector<int> data = {235, 140, 4};
-	assert(validUtf8(data) == false);
+	assert(validUtf8_2(data) == false);
 	data = {197, 130, 1};
-	assert(validUtf8(data) == true);
+	assert(validUtf8_2(data) == true);
 	data = {255};
-	assert(validUtf8(data) == false);
+	assert(validUtf8_2(data) == false);
 }
